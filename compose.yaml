@@ -1,0 +1,51 @@
+networks:
+  virtu-learn:
+
+services:
+  composer:
+    container_name: composer
+    image: composer:2.7.6
+    working_dir: /var/www/html
+    volumes:
+      - ./api:/var/www/html
+    entrypoint: ["composer"]
+
+  web:
+    container_name: virtu-learn-web
+    build:
+      context: ./app
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    ports:
+      - "8080:8080"
+    networks:
+      - virtu-learn
+  
+  api:
+    container_name: virtu-learn-api
+    build:
+      context: ./api
+    volumes:
+      - ./api:/var/www/html
+      - /var/www/html/vendor
+    ports:
+      - "8000:8000"
+    networks:
+      - virtu-learn
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: virtu-learn-mysql
+    image: mysql
+    restart: always
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - "4306:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - virtu-learn
+
