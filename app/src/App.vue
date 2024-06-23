@@ -9,14 +9,17 @@ defineOptions({
   async preFetch ({ store, currentRoute, redirect }) {
     const authStore = useAuthStore(store)
 
-    await authStore.getUser()
+    try {
+      await authStore.getUser()
+    } catch (error) {
+    } finally {
+      if (!authStore.user) {
+        if (currentRoute.meta.role == Role.Admin && currentRoute.path != '/admin/login') redirect({ path: '/admin/login' })
+      }
 
-    if (!authStore.user) {
-      if (currentRoute.meta.role == Role.Admin && currentRoute.path != '/admin/login') redirect({ path: '/admin/login' })
-    }
-
-    if (authStore.user) {
-      if (currentRoute.meta.role == Role.AdminGuest) redirect({ path: '/admin' })
+      if (authStore.user) {
+        if (currentRoute.meta.role == Role.AdminGuest && authStore.user.role == Role.Admin) redirect({ path: '/admin' })
+      }
     }
   }
 })

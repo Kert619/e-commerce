@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Kert Tatoy',
             'email' => 'tatoy.kert.e@gmail.com',
             'password' => 'password',
-            'role' => '1'
+            'role' => '1',
         ]);
     }
 }

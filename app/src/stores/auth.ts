@@ -45,10 +45,20 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const getUser = async () => {
-    try {
-      const response = await api.get('user');
-      user.value = response.data.data;
-    } catch (error) {}
+    return api
+      .get('user')
+      .then((response) => {
+        user.value = response.data.data;
+      })
+      .catch((error) => {
+        Notify.create({
+          message: error.response?.data.message,
+          type: 'negative',
+          position: 'top-right',
+          progress: true,
+        });
+        throw error;
+      });
   };
 
   const logout = async () => {

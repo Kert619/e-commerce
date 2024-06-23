@@ -52,7 +52,6 @@ const onLogin = async () => {
         await authStore.getUser()
         router.replace('/admin')
     } catch (error) {
-
     } finally {
         loading.value = false
     }
