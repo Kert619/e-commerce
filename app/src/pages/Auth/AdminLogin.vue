@@ -14,12 +14,12 @@
             </q-card-section>
             <q-card-section>
                 <q-form class="q-gutter-md" @submit="onLogin">
-                    <q-input v-model="form.email" label="E-mail" lazy-rules :rules="emailRules" />
-                    <q-input type="password" v-model="form.password" label="Password" lazy-rules
-                        :rules="passwordRules" />
-
+                    <q-input v-model.trim="form.email" label="E-mail" lazy-rules
+                        :rules="[(val) => required(val, 'E-mail'), (val) => email(val, 'E-mail')]" />
+                    <q-input type="password" v-model.trim="form.password" label="Password" lazy-rules
+                        :rules="[(val) => required(val, 'Password')]" />
                     <div>
-                        <q-btn label="Login" type="submit" color="primary" />
+                        <q-btn label="Login" type="submit" color="primary" :loading="loading" />
                     </div>
                 </q-form>
             </q-card-section>
@@ -34,17 +34,27 @@ import { useRouter } from 'vue-router'
 import { useValidation } from 'src/composables/useValidation'
 
 const authStore = useAuthStore()
+const loading = ref(false)
 
 const form: Ref<LoginAuth> = ref({
     email: '',
-    password: ''
+    password: '',
 })
 
 const router = useRouter()
-const { emailRules, passwordRules } = useValidation()
+
+const { required, email } = useValidation()
 
 const onLogin = async () => {
-    await authStore.login(form.value)
-    router.replace('/admin')
+    try {
+        loading.value = true
+        await authStore.login(form.value)
+        await authStore.getUser()
+        router.replace('/admin')
+    } catch (error) {
+
+    } finally {
+        loading.value = false
+    }
 }
 </script>

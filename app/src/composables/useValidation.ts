@@ -1,22 +1,22 @@
-// src/composables/useValidation.ts
-
 import * as yup from 'yup';
 
 // Define the schema types
-const emailSchema = yup
-  .string()
-  .required('Email is required')
-  .email('Invalid email');
-
-const passwordSchema = yup.string().required('Password is required');
+const requiredSchema = yup
+  .mixed()
+  .transform((val) =>
+    val == null || val == undefined || val == '' ? undefined : val
+  )
+  .required();
+const emailSchema = yup.string().email();
 
 // Define the validate function
 const validate = async (
-  schema: yup.StringSchema,
-  value: string
+  schema: yup.StringSchema | yup.MixedSchema,
+  value: string,
+  label: string
 ): Promise<boolean | string> => {
   try {
-    await schema.validate(value);
+    await schema.label(label).validate(value);
     return true;
   } catch (error) {
     return (error as yup.ValidationError).message;
@@ -25,11 +25,14 @@ const validate = async (
 
 // Export the useValidation function
 export function useValidation() {
-  const emailRules = [(val: string) => validate(emailSchema, val)];
-  const passwordRules = [(val: string) => validate(passwordSchema, val)];
+  const required = (val: string, label: string) =>
+    validate(requiredSchema, val, label);
+
+  const email = (val: string, label: string) =>
+    validate(emailSchema, val, label);
 
   return {
-    emailRules,
-    passwordRules,
+    required,
+    email,
   };
 }

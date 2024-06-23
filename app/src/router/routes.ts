@@ -1,9 +1,11 @@
+import { Role } from 'src/stores/auth';
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/admin/login',
     component: () => import('layouts/LoginLayout.vue'),
+    meta: { role: Role.AdminGuest },
     children: [
       {
         path: '',
@@ -14,7 +16,18 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/admin',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    meta: { requiresAuth: true, role: Role.Admin },
+    children: [
+      { path: '', component: () => import('pages/IndexPage.vue') },
+      {
+        path: 'categories',
+        component: () => import('pages/Products/CategoriesPage.vue'),
+      },
+      {
+        path: 'products',
+        component: () => import('pages/Products/ProductsPage.vue'),
+      },
+    ],
   },
 
   // Always leave this as last one,

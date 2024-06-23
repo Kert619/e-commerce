@@ -36,14 +36,16 @@ export default boot(({ app, ssrContext, urlPath, redirect }) => {
       api.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
     }
 
-    api.defaults.headers.common['Referer'] = process.env.APP;
     api.defaults.headers.common['Origin'] = process.env.APP;
   }
 
   api.interceptors.response.use(
     (config) => config,
     (error) => {
-      if (!urlPath.toLowerCase().startsWith('/admin/login')) {
+      if (
+        error.response.status == 401 &&
+        !urlPath.toLowerCase().startsWith('/admin/login')
+      ) {
         redirect({ path: '/admin/login' });
       }
 

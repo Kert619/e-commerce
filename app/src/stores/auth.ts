@@ -4,8 +4,10 @@ import { api, web } from 'boot/axios';
 import { Notify } from 'quasar';
 
 export enum Role {
-  User = 0,
-  Admin = 1,
+  User = 1,
+  Admin = 2,
+  UserGuest = 3,
+  AdminGuest = 4,
 }
 
 export type User = {
@@ -25,10 +27,9 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials: LoginAuth) => {
     await web.get('sanctum/csrf-cookie');
 
-    return web
+    return api
       .post('login', credentials)
       .then((response) => {
-        user.value = response.data;
         return response;
       })
       .catch((error) => {
@@ -50,5 +51,23 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {}
   };
 
-  return { user, login, getUser };
+  const logout = async () => {
+    return api
+      .post('logout')
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        Notify.create({
+          message: error.response?.data.message,
+          type: 'negative',
+          position: 'top-right',
+          progress: true,
+        });
+
+        throw error;
+      });
+  };
+
+  return { user, login, logout, getUser };
 });

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\LoginRequest;
 use App\Traits\HttpResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,7 @@ class AuthController extends Controller
             return $this->success(Auth::user(), 'Logged in successfully');
         }
 
-        return $this->error('Email or password is incorrect');
+        return $this->error('Email or password is incorrect', 401);
     }
 
     /**
@@ -31,13 +31,13 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return $this->success(null, 'Logged out successfully, 204');
+        return $this->success(null, 'Logged out successfully', 204);
     }
 
     /**
