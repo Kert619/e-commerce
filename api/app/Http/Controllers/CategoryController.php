@@ -22,10 +22,10 @@ class CategoryController extends Controller
         $query = Category::query();
 
         foreach ($filter as $key => $value) {
-            $query->where($key, 'LIKE', '%' . $value . '%');
+            $query->where($key, 'LIKE', "%$value%");
         }
 
-        $categories = $query->paginate(20);
+        $categories = $query->with(['parentCategory', 'subCategories'])->get();
 
         return $this->success(CategoryResource::collection($categories));
     }

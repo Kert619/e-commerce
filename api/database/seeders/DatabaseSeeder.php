@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
             'role' => '1',
         ]);
+
+        $this->call([CategorySeeder::class]);
     }
 }
