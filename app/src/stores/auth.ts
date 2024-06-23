@@ -4,10 +4,10 @@ import { api, web } from 'boot/axios';
 import { Notify } from 'quasar';
 
 export enum Role {
-  User = 1,
-  Admin = 2,
-  UserGuest = 3,
-  AdminGuest = 4,
+  User = 0,
+  Admin = 1,
+  UserGuest = 2,
+  AdminGuest = 3,
 }
 
 export type User = {
@@ -47,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
   const getUser = async () => {
     try {
       const response = await api.get('user');
-      user.value = response.data;
+      user.value = response.data.data;
     } catch (error) {}
   };
 

@@ -12,9 +12,29 @@
           E-Commerce
         </q-toolbar-title>
 
-        <q-btn flat round dense icon="mdi-logout" @click="handleLogout">
-          <q-tooltip>Logout</q-tooltip>
-        </q-btn>
+        <q-btn-dropdown auto-close split flat :label="authStore.user?.name" :loading="loading">
+          <q-list dense separator>
+            <q-item clickable>
+              <q-item-section avatar>
+                <q-avatar icon="mdi-account-outline" />
+              </q-item-section>
+
+              <q-item-section>
+                Profile
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable @click="handleLogout">
+              <q-item-section avatar>
+                <q-avatar icon="mdi-logout" />
+              </q-item-section>
+
+              <q-item-section>
+                Logout
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-toolbar>
     </q-header>
 
@@ -61,16 +81,15 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
 import { useAuthStore } from 'src/stores/auth';
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 
-const $q = useQuasar()
 const authStore = useAuthStore()
 const route = useRoute()
 const leftDrawerOpen = ref(false)
 const dataEntryMenu = ref(false)
+const loading = ref(false)
 
 onMounted(() => {
   dataEntryMenu.value = route.path == '/admin/categories' || route.path == '/admin/products'
@@ -79,14 +98,10 @@ onMounted(() => {
 const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 
 const handleLogout = () => {
-  $q.dialog({
-    title: 'Confirm',
-    message: 'Do you want to logout?',
-    cancel: true,
-  }).onOk(() => {
-    authStore.logout().finally(() => {
-      window.location.reload();
-    })
+  loading.value = true
+  authStore.logout().finally(() => {
+    loading.value = false
+    window.location.reload();
   })
 }
 </script>
