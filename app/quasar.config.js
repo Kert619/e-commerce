@@ -21,7 +21,6 @@ module.exports = configure(function (/* ctx */) {
       warnings: true,
       errors: true,
     },
-
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
@@ -53,7 +52,7 @@ module.exports = configure(function (/* ctx */) {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node20',
       },
-
+      extractCSS: true,
       vitePlugins: [
         [
           'vite-plugin-checker',
@@ -88,7 +87,7 @@ module.exports = configure(function (/* ctx */) {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      // extendViteConf(viteConf) {},
       // viteVuePluginOptions: {},
 
       // vitePlugins: [

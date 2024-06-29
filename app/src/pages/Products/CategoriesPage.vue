@@ -9,9 +9,22 @@ import CategoryIndex from 'components/Categories/CategoryIndex.vue';
 import { useCategoryStore } from 'src/stores/category';
 
 defineOptions({
-  async preFetch({ store }) {
+  async preFetch({ store, currentRoute }) {
     const categoryStore = useCategoryStore()(store);
-    await categoryStore.fetchIndex();
+
+    let page = 1;
+    let perPage = 10;
+
+    if (currentRoute.query.page)
+      page = parseInt(currentRoute.query.page.toString());
+
+    if (currentRoute.query.per_page)
+      perPage = parseInt(currentRoute.query.per_page.toString());
+
+    if (currentRoute.query.search)
+      categoryStore.filter.category_name = currentRoute.query.search.toString();
+
+    await categoryStore.fetchIndex(page, perPage, true);
   },
 });
 </script>

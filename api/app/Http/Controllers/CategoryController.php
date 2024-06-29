@@ -17,17 +17,17 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->all();
+        $categoryName = $request->input('category_name');
+
+        $perPage = $request->input('per_page', 10);
 
         $query = Category::query();
 
-        foreach ($filter as $key => $value) {
-            $query->where($key, 'LIKE', "%$value%");
-        }
+        $query = $query->where('category_name', 'LIKE', "%$categoryName%");
 
-        $categories = $query->with(['parentCategory', 'subCategories'])->get();
+        $categories = $query->with(['parentCategory', 'subCategories'])->paginate($perPage);
 
-        return $this->success(CategoryResource::collection($categories));
+        return CategoryResource::collection($categories);
     }
 
     /**
@@ -47,7 +47,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return $this->success(new CategoryResource($category));
+        return new CategoryResource($category);
     }
 
 
