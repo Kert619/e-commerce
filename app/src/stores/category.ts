@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { Ref, ref } from 'vue';
 import { api } from 'boot/axios';
-import { Notify, QTableProps } from 'quasar';
-import { Meta } from 'src/types/meta';
+import { Notify, QSelectOption, QTableProps } from 'quasar';
 
 export type CategoryObject = {
   $id: string | null;
@@ -21,8 +20,8 @@ export const useCategoryStore = (categoryId = 0) =>
   defineStore(`category/${categoryId}`, () => {
     const filter: Ref<filter> = ref({});
     const index: Ref<CategoryObject[]> = ref([]);
-    const indexMeta: Ref<Meta> = ref(<Meta>{});
     const created: Ref<Map<string, CategoryObject>> = ref(new Map());
+    const options: Ref<QSelectOption<number>[]> = ref([]);
     const pagination: Ref<QTableProps['pagination']> = ref({
       page: 1,
       rowsPerPage: 10,
@@ -31,7 +30,7 @@ export const useCategoryStore = (categoryId = 0) =>
     const fetchIndex = async (page = 1, perPage = 10, force = false) => {
       if (index.value.length === 0 || force) {
         const urlParams = new URLSearchParams(
-          Object.entries(filter.value).filter((param) => param[1] !== undefined)
+          Object.entries(filter.value).filter((param) => param[1])
         );
 
         return api
@@ -40,8 +39,11 @@ export const useCategoryStore = (categoryId = 0) =>
           })
           .then((response) => {
             index.value = response.data.data;
-            indexMeta.value = response.data.meta;
-            updatePaginationMeta();
+            if (pagination.value) {
+              pagination.value.page = response.data.meta.current_page;
+              pagination.value.rowsPerPage = response.data.meta.per_page;
+              pagination.value.rowsNumber = response.data.meta.total;
+            }
             return response;
           })
           .catch((error) => {
@@ -56,11 +58,24 @@ export const useCategoryStore = (categoryId = 0) =>
       }
     };
 
-    const updatePaginationMeta = () => {
-      if (!pagination.value || index.value.length === 0) return;
-      pagination.value.page = indexMeta.value.current_page;
-      pagination.value.rowsPerPage = indexMeta.value.per_page;
-      pagination.value.rowsNumber = indexMeta.value.total;
+    const fetchOptions = async (force = false) => {
+      if (options.value.length === 0 || force) {
+        return api
+          .get('categories/options')
+          .then((response) => {
+            options.value = response.data;
+            return response;
+          })
+          .catch((error) => {
+            Notify.create({
+              message: error.response?.data.message,
+              type: 'negative',
+              progress: true,
+              position: 'top-right',
+            });
+            throw error;
+          });
+      }
     };
 
     const create = (prefill: CategoryObject = <CategoryObject>{}) => {
@@ -81,13 +96,65 @@ export const useCategoryStore = (categoryId = 0) =>
       return id;
     };
 
+    const store = async (id: string) => {
+      const category = created.value.get(id);
+      if (!category) throw new Error('Invalid category key');
+
+      return api
+        .post('categories', category)
+        .then((response) => {
+          Notify.create({
+            message: 'New category created',
+            type: 'positive',
+            progress: true,
+            position: 'top-right',
+          });
+          return response;
+        })
+        .catch((error) => {
+          Notify.create({
+            message: error.response?.data.message,
+            type: 'negative',
+            progress: true,
+            position: 'top-right',
+          });
+          throw error;
+        });
+    };
+
+    const destroy = async (id: number) => {
+      return api
+        .delete(`categories/${id}`)
+        .then((response) => {
+          Notify.create({
+            message: 'Category deleted',
+            type: 'positive',
+            progress: true,
+            position: 'top-right',
+          });
+          return response;
+        })
+        .catch((error) => {
+          Notify.create({
+            message: error.response?.data.message,
+            type: 'negative',
+            progress: true,
+            position: 'top-right',
+          });
+          throw error;
+        });
+    };
+
     return {
       index,
-      indexMeta,
+      options,
       pagination,
       created,
       filter,
       fetchIndex,
+      fetchOptions,
       create,
+      store,
+      destroy,
     };
   });

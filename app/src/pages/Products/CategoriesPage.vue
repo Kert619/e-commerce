@@ -15,6 +15,7 @@ defineOptions({
     let page = 1;
     let perPage = 10;
 
+    //retain pagination and search when reloading the page
     if (currentRoute.query.page)
       page = parseInt(currentRoute.query.page.toString());
 
@@ -25,6 +26,7 @@ defineOptions({
       categoryStore.filter.category_name = currentRoute.query.search.toString();
 
     await categoryStore.fetchIndex(page, perPage, true);
+    await categoryStore.fetchOptions(true);
   },
 });
 </script>

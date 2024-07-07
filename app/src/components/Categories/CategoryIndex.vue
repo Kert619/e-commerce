@@ -68,50 +68,38 @@
 
       <template #top-row>
         <template v-if="categoryStore.created.size > 0">
-          <CategoryRow
+          <CategoryRowCreate
             v-for="created in categoryStore.created.values()"
             :key="created.$id?.toString()"
             :category="created"
+            :options="categoryStore.options"
+            :loading="loading"
             @deleted="categoryStore.created.delete(created.$id as string)"
+            @stored="handleStored"
           />
         </template>
       </template>
 
       <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td key="id" :props="props" auto-width>
-            {{ props.row.id }}
-          </q-td>
-
-          <q-td key="category_name" :props="props">
-            {{ props.row.category_name }}
-          </q-td>
-
-          <q-td key="parent_category" :props="props">
-            {{ props.row.parent_category?.category_name }}
-          </q-td>
-
-          <q-td key="action" auto-width>
-            <q-btn
-              flat
-              dense
-              round
-              icon="mdi-delete-outline"
-              color="negative"
-            />
-          </q-td>
-        </q-tr>
+        <CategoryRowEdit
+          :body-props="props"
+          :options="categoryStore.options"
+          :loading="loading"
+          :key="props.row.id"
+          @deleted="handleDeleted"
+        />
       </template>
     </q-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { QTableColumn, QTableProps } from 'quasar';
+import { QTableColumn, QTableProps, useQuasar } from 'quasar';
 import { useCategoryStore } from 'src/stores/category';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import CategoryRow from 'components/Categories/CategoryRow.vue';
+import CategoryRowCreate from 'components/Categories/CategoryRowCreate.vue';
+import CategoryRowEdit from 'components/Categories/CategoryRowEdit.vue';
 
 const columns: QTableColumn[] = [
   {
@@ -146,12 +134,13 @@ type Query = {
   search?: string;
 };
 
+const $q = useQuasar();
 const categoryStore = useCategoryStore()();
 const router = useRouter();
 const filter = ref(categoryStore.filter.category_name as string);
 const loading = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
   categoryStore.created = new Map();
 });
 
@@ -167,8 +156,8 @@ const fetchIndex = async (page = 1, perPage = 10) => {
   if (loading.value) return;
 
   loading.value = true;
+
   categoryStore.filter.category_name = filter.value;
-  if (!filter.value) delete categoryStore.filter.category_name;
 
   categoryStore
     .fetchIndex(page, perPage, true)
@@ -176,6 +165,39 @@ const fetchIndex = async (page = 1, perPage = 10) => {
       handleRoutePush();
     })
     .finally(() => (loading.value = false));
+};
+
+const handleStored = async (id: string) => {
+  loading.value = true;
+  categoryStore
+    .store(id)
+    .then(async () => {
+      categoryStore.created.delete(id);
+      const page = categoryStore.pagination?.page;
+      const perPage = categoryStore.pagination?.rowsPerPage;
+      categoryStore.fetchIndex(page, perPage, true);
+      categoryStore.fetchOptions(true);
+    })
+    .finally(() => (loading.value = false));
+};
+
+const handleDeleted = (id: number) => {
+  $q.dialog({
+    title: 'Confirm',
+    message: 'Do you want to remove this category?',
+    cancel: true,
+  }).onOk(() => {
+    loading.value = true;
+    categoryStore
+      .destroy(id)
+      .then(() => {
+        const page = categoryStore.pagination?.page;
+        const perPage = categoryStore.pagination?.rowsPerPage;
+        categoryStore.fetchIndex(page, perPage, true);
+        categoryStore.fetchOptions(true);
+      })
+      .finally(() => (loading.value = false));
+  });
 };
 
 //push the pagination and filter in the URL

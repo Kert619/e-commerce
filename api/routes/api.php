@@ -10,5 +10,7 @@ Route::get('/home', function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', [AuthController::class, 'user']);
+
+    Route::get('categories/options', [CategoryController::class, 'options']);
     Route::apiResource('categories', CategoryController::class);
 });

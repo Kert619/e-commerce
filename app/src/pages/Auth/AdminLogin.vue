@@ -18,20 +18,17 @@
       <q-card-section>
         <q-form class="q-gutter-md" @submit="onLogin">
           <q-input
-            v-model.trim="form.email"
+            v-model="form.email"
             label="E-mail"
             lazy-rules
-            :rules="[
-              (val) => required(val, 'E-mail'),
-              (val) => email(val, 'E-mail'),
-            ]"
+            :rules="emailRules"
           />
           <q-input
             type="password"
-            v-model.trim="form.password"
+            v-model="form.password"
             label="Password"
             lazy-rules
-            :rules="[(val) => required(val, 'Password')]"
+            :rules="passwordRules"
           />
           <div>
             <q-btn
@@ -64,6 +61,14 @@ const form: Ref<LoginAuth> = ref({
 const router = useRouter();
 
 const { required, email } = useValidation();
+
+const emailRules = [
+  (val: string) => required(val, 'Please enter your email'),
+  (val: string) => email(val, 'Please enter a valid email'),
+];
+const passwordRules = [
+  (val: string) => required(val, 'Please enter your password'),
+];
 
 const onLogin = async () => {
   try {
