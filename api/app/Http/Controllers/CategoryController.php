@@ -24,7 +24,7 @@ class CategoryController extends Controller
 
         $query = Category::query();
 
-        $query = $query->where('category_name', 'LIKE', "%$categoryName%");
+        $query = $query->where('category_name', 'LIKE', "%$categoryName%")->orderBy('category_name');
 
         $categories = $query->with(['parentCategory', 'subCategories'])->paginate($perPage);
 

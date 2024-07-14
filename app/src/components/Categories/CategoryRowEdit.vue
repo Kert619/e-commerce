@@ -36,7 +36,8 @@
         round
         icon="mdi-content-save-outline"
         color="positive"
-        :disable="loading"
+        :disable="loading || !isDirty"
+        @click="handleUpdated(categoryRef.id as number)"
       />
       <q-btn
         flat
@@ -44,8 +45,8 @@
         round
         icon="mdi-delete-outline"
         color="negative"
-        @click="handleDeleted(categoryRef.id as number)"
         :disable="loading"
+        @click="handleDeleted(categoryRef.id as number)"
       />
     </q-td>
   </q-tr>
@@ -53,7 +54,7 @@
 
 <script setup lang="ts">
 import { QSelectOption, QTableSlots } from 'quasar';
-import { Ref, toRef } from 'vue';
+import { computed, Ref, toRef } from 'vue';
 import SelectOptions from 'components/UI/SelectOptions.vue';
 import { CategoryObject } from 'src/stores/category';
 
@@ -63,12 +64,22 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-  bodyProps: Parameters<QTableSlots['body']>[0];
+  bodyProps: Parameters<QTableSlots['body']>['0'];
   options: QSelectOption<number>[];
   loading: boolean;
 }>();
 
 const categoryRef: Ref<CategoryObject> = toRef(props.bodyProps, 'row');
+const original: CategoryObject = { ...categoryRef.value };
+
+const isDirty = computed(() => {
+  return JSON.stringify(categoryRef.value) !== JSON.stringify(original);
+});
+
+const handleUpdated = (id: number) => {
+  if (!isDirty.value) return;
+  emit('updated', id);
+};
 
 const handleDeleted = (id: number) => {
   emit('deleted', id);

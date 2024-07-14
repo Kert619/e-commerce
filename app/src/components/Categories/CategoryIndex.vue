@@ -1,6 +1,61 @@
 <template>
-  <div class="q-pa-sm">
-    <div class="row q-gutter-sm">
+  <q-table
+    :columns="columns"
+    :rows="categoryStore.index"
+    row-key="id"
+    :rows-per-page-options="[10, 20, 30, 40, 50]"
+    v-model:pagination="categoryStore.pagination"
+    :loading="loading"
+    class="q-mt-sm"
+    @request="onRequest"
+  >
+    <template v-slot:header-cell-id="props">
+      <q-th :props="props">
+        {{ props.col.label }}
+      </q-th>
+    </template>
+
+    <template v-slot:header-cell-category_name="props">
+      <q-th :props="props">
+        {{ props.col.label }}
+      </q-th>
+    </template>
+
+    <template v-slot:header-cell-parent_category="props">
+      <q-th :props="props">
+        {{ props.col.label }}
+      </q-th>
+    </template>
+
+    <template #top-row>
+      <template v-if="categoryStore.created.size > 0">
+        <CategoryRowCreate
+          v-for="created in categoryStore.created.values()"
+          :key="created.$id?.toString()"
+          :category="created"
+          :options="categoryStore.options"
+          :loading="loading"
+          @deleted="categoryStore.created.delete(created.$id as string)"
+          @stored="handleStored"
+        />
+      </template>
+    </template>
+
+    <template v-slot:body="props">
+      <CategoryRowEdit
+        v-if="!refresh"
+        :body-props="props"
+        :options="categoryStore.options"
+        :loading="loading"
+        :key="props.row.id"
+        @deleted="handleDeleted"
+        @updated="handleUpdated"
+      />
+    </template>
+  </q-table>
+
+  <q-page-sticky expand position="top" class="bg-white q-pa-sm">
+    <q-toolbar class="row q-gutter-sm">
       <div class="col col-md-4">
         <q-input
           filled
@@ -36,67 +91,14 @@
           @click="categoryStore.create"
         />
       </div>
-    </div>
-
-    <q-table
-      :columns="columns"
-      :rows="categoryStore.index"
-      row-key="id"
-      :rows-per-page-options="[10, 20, 30, 40, 50]"
-      v-model:pagination="categoryStore.pagination"
-      :loading="loading"
-      class="q-mt-sm"
-      @request="onRequest"
-    >
-      <template v-slot:header-cell-id="props">
-        <q-th :props="props">
-          {{ props.col.label }}
-        </q-th>
-      </template>
-
-      <template v-slot:header-cell-category_name="props">
-        <q-th :props="props">
-          {{ props.col.label }}
-        </q-th>
-      </template>
-
-      <template v-slot:header-cell-parent_category="props">
-        <q-th :props="props">
-          {{ props.col.label }}
-        </q-th>
-      </template>
-
-      <template #top-row>
-        <template v-if="categoryStore.created.size > 0">
-          <CategoryRowCreate
-            v-for="created in categoryStore.created.values()"
-            :key="created.$id?.toString()"
-            :category="created"
-            :options="categoryStore.options"
-            :loading="loading"
-            @deleted="categoryStore.created.delete(created.$id as string)"
-            @stored="handleStored"
-          />
-        </template>
-      </template>
-
-      <template v-slot:body="props">
-        <CategoryRowEdit
-          :body-props="props"
-          :options="categoryStore.options"
-          :loading="loading"
-          :key="props.row.id"
-          @deleted="handleDeleted"
-        />
-      </template>
-    </q-table>
-  </div>
+    </q-toolbar>
+  </q-page-sticky>
 </template>
 
 <script setup lang="ts">
 import { QTableColumn, QTableProps, useQuasar } from 'quasar';
 import { useCategoryStore } from 'src/stores/category';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import CategoryRowCreate from 'components/Categories/CategoryRowCreate.vue';
 import CategoryRowEdit from 'components/Categories/CategoryRowEdit.vue';
@@ -139,6 +141,7 @@ const categoryStore = useCategoryStore()();
 const router = useRouter();
 const filter = ref(categoryStore.filter.category_name as string);
 const loading = ref(false);
+const refresh = ref(false);
 
 onMounted(async () => {
   categoryStore.created = new Map();
@@ -147,6 +150,12 @@ onMounted(async () => {
 onUnmounted(() => {
   delete categoryStore.filter.category_name;
 });
+
+const refreshRow = async () => {
+  refresh.value = true;
+  await nextTick();
+  refresh.value = false;
+};
 
 const onRequest: QTableProps['onRequest'] = async ({ pagination }) => {
   await fetchIndex(pagination.page, pagination.rowsPerPage);
@@ -169,14 +178,15 @@ const fetchIndex = async (page = 1, perPage = 10) => {
 
 const handleStored = async (id: string) => {
   loading.value = true;
+  categoryStore.store(id).finally(() => (loading.value = false));
+};
+
+const handleUpdated = async (id: number) => {
+  loading.value = true;
   categoryStore
-    .store(id)
+    .update(id)
     .then(async () => {
-      categoryStore.created.delete(id);
-      const page = categoryStore.pagination?.page;
-      const perPage = categoryStore.pagination?.rowsPerPage;
-      categoryStore.fetchIndex(page, perPage, true);
-      categoryStore.fetchOptions(true);
+      await refreshRow();
     })
     .finally(() => (loading.value = false));
 };
@@ -188,15 +198,7 @@ const handleDeleted = (id: number) => {
     cancel: true,
   }).onOk(() => {
     loading.value = true;
-    categoryStore
-      .destroy(id)
-      .then(() => {
-        const page = categoryStore.pagination?.page;
-        const perPage = categoryStore.pagination?.rowsPerPage;
-        categoryStore.fetchIndex(page, perPage, true);
-        categoryStore.fetchOptions(true);
-      })
-      .finally(() => (loading.value = false));
+    categoryStore.destroy(id).finally(() => (loading.value = false));
   });
 };
 

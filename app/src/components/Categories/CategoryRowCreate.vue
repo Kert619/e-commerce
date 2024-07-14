@@ -1,7 +1,7 @@
 <template>
   <q-tr>
     <q-td>
-      <q-chip label="New" icon="mdi-plus" :ripple="false" />
+      <q-chip label="New" icon="mdi-identifier" :ripple="false" />
     </q-td>
     <q-td>
       <q-input
@@ -30,7 +30,7 @@
         icon="mdi-content-save-outline"
         color="positive"
         @click="handleSave"
-        :disable="loading"
+        :disable="loading || disableSave"
       />
       <q-btn
         flat
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { QSelectOption } from 'quasar';
 import { CategoryObject } from 'src/stores/category';
-import { toRef } from 'vue';
+import { computed, toRef } from 'vue';
 import SelectOptions from 'components/UI/SelectOptions.vue';
 import { useValidation } from 'src/composables/useValidation';
 
@@ -67,6 +67,12 @@ const categoryRef = toRef(props.category);
 const { required } = useValidation();
 
 const categoryNameRules = [(val: string) => required(val)];
+
+const disableSave = computed(() => {
+  if (!categoryRef.value.category_name) return true;
+
+  return false;
+});
 
 const handleDelete = () => {
   emit('deleted', categoryRef.value.$id as string);

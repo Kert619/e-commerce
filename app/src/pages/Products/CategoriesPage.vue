@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page padding style="padding-top: 50px">
     <CategoryIndex />
   </q-page>
 </template>

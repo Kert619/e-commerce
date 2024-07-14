@@ -12,13 +12,13 @@ export type CategoryObject = {
   sub_categories: CategoryObject[];
 };
 
-type filter = {
+type Filter = {
   category_name?: string;
 };
 
 export const useCategoryStore = (categoryId = 0) =>
   defineStore(`category/${categoryId}`, () => {
-    const filter: Ref<filter> = ref({});
+    const filter: Ref<Filter> = ref({});
     const index: Ref<CategoryObject[]> = ref([]);
     const created: Ref<Map<string, CategoryObject>> = ref(new Map());
     const options: Ref<QSelectOption<number>[]> = ref([]);
@@ -102,9 +102,52 @@ export const useCategoryStore = (categoryId = 0) =>
 
       return api
         .post('categories', category)
-        .then((response) => {
+        .then(async (response) => {
+          await Promise.all([
+            fetchIndex(
+              pagination.value?.page,
+              pagination.value?.rowsPerPage,
+              true
+            ),
+            fetchOptions(true),
+          ]);
+          created.value.delete(id);
           Notify.create({
             message: 'New category created',
+            type: 'positive',
+            progress: true,
+            position: 'top-right',
+          });
+          return response;
+        })
+        .catch((error) => {
+          Notify.create({
+            message: error.response?.data.message,
+            type: 'negative',
+            progress: true,
+            position: 'top-right',
+          });
+          throw error;
+        });
+    };
+
+    const update = async (id: number) => {
+      const category = index.value.find((category) => category.id === id);
+      if (!category) throw new Error('Invalid category id');
+
+      return api
+        .put(`categories/${id}`, category)
+        .then(async (response) => {
+          await Promise.all([
+            fetchIndex(
+              pagination.value?.page,
+              pagination.value?.rowsPerPage,
+              true
+            ),
+            fetchOptions(true),
+          ]);
+          Notify.create({
+            message: 'Category updated',
             type: 'positive',
             progress: true,
             position: 'top-right',
@@ -125,7 +168,15 @@ export const useCategoryStore = (categoryId = 0) =>
     const destroy = async (id: number) => {
       return api
         .delete(`categories/${id}`)
-        .then((response) => {
+        .then(async (response) => {
+          await Promise.all([
+            fetchIndex(
+              pagination.value?.page,
+              pagination.value?.rowsPerPage,
+              true
+            ),
+            fetchOptions(true),
+          ]);
           Notify.create({
             message: 'Category deleted',
             type: 'positive',
@@ -155,6 +206,7 @@ export const useCategoryStore = (categoryId = 0) =>
       fetchOptions,
       create,
       store,
+      update,
       destroy,
     };
   });

@@ -4,7 +4,7 @@ import * as yup from 'yup';
 const requiredSchema = yup
   .mixed()
   .transform((val) =>
-    val == null || val == undefined || String(val).trim() == ''
+    val === null || val === undefined || String(val).trim() === ''
       ? undefined
       : val
   )
