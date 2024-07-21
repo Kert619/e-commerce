@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttributeUnitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
@@ -13,4 +14,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('categories/options', [CategoryController::class, 'options']);
     Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('attribute-units', AttributeUnitController::class);
 });

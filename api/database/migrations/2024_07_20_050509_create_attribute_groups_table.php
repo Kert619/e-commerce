@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('attribute_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('category_name');
-            $table->foreignId('parent_category_id')->nullable()->constrained('categories')->cascadeOnDelete();
+            $table->string('attribute_group_name');
+            $table->foreignId('attribute_category_id')->constrained('attribute_categories')->cascadeOnDelete();
+            $table->unsignedInteger('priority');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('attribute_groups');
     }
 };

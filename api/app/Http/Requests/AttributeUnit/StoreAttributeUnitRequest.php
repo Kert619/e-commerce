@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\AttributeUnit;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCategoryRequest extends FormRequest
+class StoreAttributeUnitRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_name' => ['required', 'max:255'],
-            'parent_category_id' => ['nullable', 'exists:categories,id']
+            'attribute_unit_name' => ['required', 'unique', 'max:255'],
+            'attribute_unit_short_name' => ['required', 'unique', 'max:255']
         ];
     }
 }

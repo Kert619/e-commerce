@@ -7,7 +7,6 @@ use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Traits\HttpResponse;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -69,17 +68,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        try {
-            $category->delete();
-            $this->success(null, 'Category deleted successfully', 204);
-        } catch (QueryException $e) {
-            //foreign key constraint error
-            if ($e->getCode() == '23000') {
-                return $this->error('Error deleting. Category has sub categories', 409);
-            } else {
-                return $this->error('Error deleting. An unexpected error occured', 500);
-            }
-        }
+        $category->delete();
+        $this->success(null, 'Category deleted successfully', 204);
     }
 
     public function options()

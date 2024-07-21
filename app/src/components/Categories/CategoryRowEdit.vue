@@ -70,7 +70,7 @@ const props = defineProps<{
 }>();
 
 const categoryRef: Ref<CategoryObject> = toRef(props.bodyProps, 'row');
-const original: CategoryObject = { ...categoryRef.value };
+const original = { ...categoryRef.value };
 
 const isDirty = computed(() => {
   return JSON.stringify(categoryRef.value) !== JSON.stringify(original);

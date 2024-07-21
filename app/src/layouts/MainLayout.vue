@@ -42,19 +42,16 @@
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
       <q-scroll-area class="fit">
         <q-list>
-          <!-- DATA ENTRY -->
-          <q-expansion-item group="group" dense v-model="dataEntryMenu">
-            <template #header="scope">
+          <!-- PRODUCT MANAGEMENT -->
+          <q-expansion-item dense v-model="menu.productManagement">
+            <template #header>
               <q-item class="q-pa-none full-width">
                 <q-item-section avatar>
-                  <q-icon
-                    :color="scope.expanded ? 'primary' : ''"
-                    name="mdi-database-plus-outline"
-                  />
+                  <q-icon color="primary" name="mdi-database-plus-outline" />
                 </q-item-section>
 
-                <q-item-section :class="{ 'text-primary': scope.expanded }"
-                  >Data Entry</q-item-section
+                <q-item-section class="text-primary"
+                  >Product Management</q-item-section
                 >
               </q-item>
             </template>
@@ -87,6 +84,49 @@
               <q-item-section class="text-primary">Products</q-item-section>
             </q-item>
           </q-expansion-item>
+
+          <!-- PRODUCT ATTRIBUTES -->
+          <q-expansion-item dense v-model="menu.productAttributes">
+            <template #header>
+              <q-item class="q-pa-none full-width">
+                <q-item-section avatar>
+                  <q-icon color="primary" name="mdi-database-plus-outline" />
+                </q-item-section>
+
+                <q-item-section class="text-primary"
+                  >Product Attributes</q-item-section
+                >
+              </q-item>
+            </template>
+
+            <q-item
+              :inset-level="1"
+              clickable
+              v-ripple
+              to="/admin/attributes"
+              active-class="bg-blue-1"
+            >
+              <q-item-section avatar>
+                <q-icon color="primary" name="mdi-shape-outline" />
+              </q-item-section>
+
+              <q-item-section class="text-primary">Attributes</q-item-section>
+            </q-item>
+
+            <q-item
+              :inset-level="1"
+              clickable
+              v-ripple
+              to="/admin/units"
+              active-class="bg-blue-1"
+            >
+              <q-item-section avatar>
+                <q-icon color="primary" name="mdi-shape-outline" />
+              </q-item-section>
+
+              <q-item-section class="text-primary">Units</q-item-section>
+            </q-item>
+          </q-expansion-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -105,12 +145,18 @@ import { useRoute } from 'vue-router';
 const authStore = useAuthStore();
 const route = useRoute();
 const leftDrawerOpen = ref(false);
-const dataEntryMenu = ref(false);
+const menu = ref({
+  productManagement: false,
+  productAttributes: false,
+});
 const loading = ref(false);
 
 onMounted(() => {
-  dataEntryMenu.value =
+  menu.value.productManagement =
     route.path == '/admin/categories' || route.path == '/admin/products';
+
+  menu.value.productAttributes =
+    route.path == '/admin/attributes' || route.path == '/admin/units';
 });
 
 const toggleLeftDrawer = () => (leftDrawerOpen.value = !leftDrawerOpen.value);

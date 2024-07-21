@@ -19,7 +19,8 @@ class CategoryResource extends JsonResource
             'category_name' => $this->category_name,
             'parent_category_id' => $this->parent_category_id,
             'parent_category' => new CategoryResource($this->whenLoaded('parentCategory')),
-            'sub_categories' => CategoryResource::collection($this->whenLoaded('subCategories'))
+            'sub_categories' => CategoryResource::collection($this->whenLoaded('subCategories')),
+            'products' => ProductResource::collection($this->whenLoaded('products'))
         ];
     }
 }
