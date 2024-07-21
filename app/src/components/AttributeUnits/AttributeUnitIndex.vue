@@ -98,8 +98,8 @@
 import { QTableColumn, useQuasar } from 'quasar';
 import { useAttributeUnitStore } from 'src/stores/attribute-unit';
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
-import AttributeUnitRowCreate from 'components/Attributes/AttributeUnitRowCreate.vue';
-import AttributeUnitRowEdit from 'components/Attributes/AttributeUnitRowEdit.vue';
+import AttributeUnitRowCreate from 'components/AttributeUnits/AttributeUnitRowCreate.vue';
+import AttributeUnitRowEdit from 'components/AttributeUnits/AttributeUnitRowEdit.vue';
 import { useRouter } from 'vue-router';
 
 const columns: QTableColumn[] = [

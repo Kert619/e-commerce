@@ -80,16 +80,16 @@ export const useAttributeUnitStore = defineStore('attribute-unit', () => {
   };
 
   const store = async (id: string) => {
-    const unit = created.value.get(id);
-    if (!unit) throw new Error('Invalid unit key');
+    const attributeUnit = created.value.get(id);
+    if (!attributeUnit) throw new Error('Invalid attribute unit key');
 
     return api
-      .post('attribute-units', unit)
+      .post('attribute-units', attributeUnit)
       .then(async (response) => {
-        await Promise.all([fetchIndex(true), fetchOptions(true)]);
         created.value.delete(id);
+        await Promise.all([fetchIndex(true), fetchOptions(true)]);
         Notify.create({
-          message: 'New unit created',
+          message: 'New attribute unit created',
           type: 'positive',
           progress: true,
           position: 'top-right',
@@ -108,15 +108,15 @@ export const useAttributeUnitStore = defineStore('attribute-unit', () => {
   };
 
   const update = async (id: number) => {
-    const unit = index.value.find((unit) => unit.id === id);
-    if (!unit) throw new Error('Invalid unit id');
+    const attributeUnit = index.value.find((unit) => unit.id === id);
+    if (!attributeUnit) throw new Error('Invalid attribute unit id');
 
     return api
-      .put(`attribute-units/${id}`, unit)
+      .put(`attribute-units/${id}`, attributeUnit)
       .then(async (response) => {
         await Promise.all([fetchIndex(true), fetchOptions(true)]);
         Notify.create({
-          message: 'Unit updated',
+          message: 'Attribute unit updated',
           type: 'positive',
           progress: true,
           position: 'top-right',
@@ -140,7 +140,7 @@ export const useAttributeUnitStore = defineStore('attribute-unit', () => {
       .then(async (response) => {
         await Promise.all([fetchIndex(true), fetchOptions(true)]);
         Notify.create({
-          message: 'Unit deleted',
+          message: 'Attribute unit deleted',
           type: 'positive',
           progress: true,
           position: 'top-right',

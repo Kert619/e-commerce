@@ -1,5 +1,5 @@
 <template>
-  <q-page padding style="padding-top: 50px">
+  <q-page padding style="padding-top: 55px">
     <ProductIndex />
   </q-page>
 </template>

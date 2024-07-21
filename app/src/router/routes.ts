@@ -28,8 +28,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/Products/ProductsPage.vue'),
       },
       {
-        path: 'units',
+        path: 'attribute-units',
         component: () => import('pages/Attributes/AttributeUnitsPage.vue'),
+      },
+      {
+        path: 'attribute-definitions',
+        component: () =>
+          import('pages/Attributes/AttributeDefinitionsPage.vue'),
       },
     ],
   },

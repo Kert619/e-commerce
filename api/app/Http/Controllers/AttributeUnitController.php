@@ -25,8 +25,8 @@ class AttributeUnitController extends Controller
             $query->where($key, 'LIKE', "%$value%");
         }
 
-        $units = $query->get();
-        return AttributeUnitResource::collection($units);
+        $attributeUnits = $query->get();
+        return AttributeUnitResource::collection($attributeUnits);
     }
 
     /**

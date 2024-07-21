@@ -1,11 +1,11 @@
 <template>
-  <q-page padding style="padding-top: 50px">
+  <q-page padding style="padding-top: 55px">
     <AttributeUnitIndex />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import AttributeUnitIndex from 'components/Attributes/AttributeUnitIndex.vue';
+import AttributeUnitIndex from 'components/AttributeUnits/AttributeUnitIndex.vue';
 import { useAttributeUnitStore } from 'stores/attribute-unit';
 
 defineOptions({

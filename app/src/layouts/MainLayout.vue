@@ -85,7 +85,7 @@
             </q-item>
           </q-expansion-item>
 
-          <!-- PRODUCT ATTRIBUTES -->
+          <!-- ATTRIBUTES & UNITS-->
           <q-expansion-item dense v-model="menu.productAttributes">
             <template #header>
               <q-item class="q-pa-none full-width">
@@ -103,28 +103,32 @@
               :inset-level="1"
               clickable
               v-ripple
-              to="/admin/attributes"
+              to="/admin/attribute-definitions"
               active-class="bg-blue-1"
             >
               <q-item-section avatar>
                 <q-icon color="primary" name="mdi-tag-multiple-outline" />
               </q-item-section>
 
-              <q-item-section class="text-primary">Attributes</q-item-section>
+              <q-item-section class="text-primary"
+                >Attribute Definitions</q-item-section
+              >
             </q-item>
 
             <q-item
               :inset-level="1"
               clickable
               v-ripple
-              to="/admin/units"
+              to="/admin/attribute-units"
               active-class="bg-blue-1"
             >
               <q-item-section avatar>
                 <q-icon color="primary" name="mdi-set-square" />
               </q-item-section>
 
-              <q-item-section class="text-primary">Units</q-item-section>
+              <q-item-section class="text-primary"
+                >Attribute Units</q-item-section
+              >
             </q-item>
           </q-expansion-item>
         </q-list>
@@ -156,7 +160,8 @@ onMounted(() => {
     route.path == '/admin/categories' || route.path == '/admin/products';
 
   menu.value.productAttributes =
-    route.path == '/admin/attributes' || route.path == '/admin/units';
+    route.path == '/admin/attribute-definitions' ||
+    route.path == '/admin/attribute-units';
 });
 
 const toggleLeftDrawer = () => (leftDrawerOpen.value = !leftDrawerOpen.value);

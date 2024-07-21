@@ -102,6 +102,7 @@ export const useCategoryStore = defineStore('category', () => {
     return api
       .post('categories', category)
       .then(async (response) => {
+        created.value.delete(id);
         await Promise.all([
           fetchIndex(
             pagination.value?.page,
@@ -110,7 +111,6 @@ export const useCategoryStore = defineStore('category', () => {
           ),
           fetchOptions(true),
         ]);
-        created.value.delete(id);
         Notify.create({
           message: 'New category created',
           type: 'positive',
