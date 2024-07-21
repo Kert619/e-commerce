@@ -22,8 +22,8 @@ class StoreAttributeUnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'attribute_unit_name' => ['required', 'unique', 'max:255'],
-            'attribute_unit_short_name' => ['required', 'unique', 'max:255']
+            'attribute_unit_name' => ['required', 'unique:attribute_units,attribute_unit_name', 'max:255'],
+            'attribute_unit_short_name' => ['required', 'unique:attribute_units,attribute_unit_short_name', 'max:255']
         ];
     }
 }

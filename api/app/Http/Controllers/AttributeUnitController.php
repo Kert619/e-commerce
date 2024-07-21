@@ -17,14 +17,15 @@ class AttributeUnitController extends Controller
      */
     public function index(Request $request)
     {
-        $unitName = $request->input('unit_name');
+        $filter = $request->all();
 
         $query = AttributeUnit::query();
 
-        $query = $query->where('attribute_unit_name', 'LIKE', "%$unitName%")->orderBy('category_name');
+        foreach ($filter as $key => $value) {
+            $query->where($key, 'LIKE', "%$value%");
+        }
 
         $units = $query->get();
-
         return AttributeUnitResource::collection($units);
     }
 
@@ -64,5 +65,11 @@ class AttributeUnitController extends Controller
     {
         $attributeUnit->delete();
         $this->success(null, 'Attribute unit deleted successfully', 204);
+    }
+
+    public function options()
+    {
+        $options = AttributeUnit::query()->get(['id as value', 'attribute_unit_name as label']);
+        return $options;
     }
 }

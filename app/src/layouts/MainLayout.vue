@@ -90,11 +90,11 @@
             <template #header>
               <q-item class="q-pa-none full-width">
                 <q-item-section avatar>
-                  <q-icon color="primary" name="mdi-database-plus-outline" />
+                  <q-icon color="primary" name="mdi-pencil-ruler" />
                 </q-item-section>
 
                 <q-item-section class="text-primary"
-                  >Product Attributes</q-item-section
+                  >Attributes & Units</q-item-section
                 >
               </q-item>
             </template>
@@ -107,7 +107,7 @@
               active-class="bg-blue-1"
             >
               <q-item-section avatar>
-                <q-icon color="primary" name="mdi-shape-outline" />
+                <q-icon color="primary" name="mdi-tag-multiple-outline" />
               </q-item-section>
 
               <q-item-section class="text-primary">Attributes</q-item-section>
@@ -121,7 +121,7 @@
               active-class="bg-blue-1"
             >
               <q-item-section avatar>
-                <q-icon color="primary" name="mdi-shape-outline" />
+                <q-icon color="primary" name="mdi-set-square" />
               </q-item-section>
 
               <q-item-section class="text-primary">Units</q-item-section>

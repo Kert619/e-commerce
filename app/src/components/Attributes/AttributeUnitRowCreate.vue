@@ -5,21 +5,22 @@
     </q-td>
     <q-td>
       <q-input
-        v-model="categoryRef.category_name"
+        v-model="attributeUnitRef.attribute_unit_name"
         dense
         borderless
         lazy-rules
-        :rules="categoryNameRules"
+        :rules="attributeNameRules"
         hide-bottom-space
       />
     </q-td>
     <q-td>
-      <SelectOptions
-        v-model="categoryRef.parent_category_id"
-        :options="options"
+      <q-input
+        v-model="attributeUnitRef.attribute_unit_short_name"
         dense
         borderless
-        clearable
+        lazy-rules
+        :rules="attributeNameRules"
+        hide-bottom-space
       />
     </q-td>
     <q-td auto-width>
@@ -47,9 +48,8 @@
 
 <script setup lang="ts">
 import { QSelectOption } from 'quasar';
-import { CategoryObject } from 'src/stores/category';
+import { AttributeUnitObject } from 'src/stores/attribute-unit';
 import { computed, toRef } from 'vue';
-import SelectOptions from 'components/UI/SelectOptions.vue';
 import { useValidation } from 'src/composables/useValidation';
 
 const emit = defineEmits<{
@@ -58,27 +58,31 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-  category: CategoryObject;
+  attributeUnit: AttributeUnitObject;
   options: QSelectOption<number>[];
   loading: boolean;
 }>();
 
-const categoryRef = toRef(props.category);
+const attributeUnitRef = toRef(props.attributeUnit);
 const { required } = useValidation();
 
-const categoryNameRules = [(val: string) => required(val)];
+const attributeNameRules = [(val: string) => required(val)];
 
 const disableSave = computed(() => {
-  if (!categoryRef.value.category_name) return true;
+  if (
+    !attributeUnitRef.value.attribute_unit_name ||
+    !attributeUnitRef.value.attribute_unit_short_name
+  )
+    return true;
 
   return false;
 });
 
 const handleDelete = () => {
-  emit('deleted', categoryRef.value.$id as string);
+  emit('deleted', attributeUnitRef.value.$id as string);
 };
 
 const handleSave = () => {
-  emit('stored', categoryRef.value.$id as string);
+  emit('stored', attributeUnitRef.value.$id as string);
 };
 </script>

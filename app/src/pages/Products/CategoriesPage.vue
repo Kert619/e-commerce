@@ -10,7 +10,7 @@ import { useCategoryStore } from 'src/stores/category';
 
 defineOptions({
   async preFetch({ store, currentRoute }) {
-    const categoryStore = useCategoryStore()(store);
+    const categoryStore = useCategoryStore(store);
 
     let page = 1;
     let perPage = 10;

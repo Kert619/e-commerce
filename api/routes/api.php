@@ -14,5 +14,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('categories/options', [CategoryController::class, 'options']);
     Route::apiResource('categories', CategoryController::class);
+    Route::get('attribute-units/options', [AttributeUnitController::class, 'options']);
     Route::apiResource('attribute-units', AttributeUnitController::class);
 });

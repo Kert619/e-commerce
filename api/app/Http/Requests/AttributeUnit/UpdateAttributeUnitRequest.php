@@ -23,8 +23,8 @@ class UpdateAttributeUnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'attribute_unit_name' => ['required', 'max:255', Rule::unique('attribute_units')->ignore($this->route('attributeUnit'))],
-            'attribute_unit_short_name' => ['required', 'max:255', Rule::unique('attribute_units')->ignore($this->route('attributeUnit'))]
+            'attribute_unit_name' => ['required', 'max:255', Rule::unique('attribute_units')->ignore($this->route('attribute_unit'))],
+            'attribute_unit_short_name' => ['required', 'max:255', Rule::unique('attribute_units')->ignore($this->route('attribute_unit'))]
         ];
     }
 }

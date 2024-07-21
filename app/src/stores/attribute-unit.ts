@@ -1,48 +1,35 @@
 import { defineStore } from 'pinia';
 import { Ref, ref } from 'vue';
 import { api } from 'boot/axios';
-import { Notify, QSelectOption, QTableProps } from 'quasar';
+import { Notify, QSelectOption } from 'quasar';
 
-export type CategoryObject = {
+export type AttributeUnitObject = {
   $id: string | null;
   id: number | null;
-  category_name: string | null;
-  parent_category_id: number | null;
-  parent_category: CategoryObject | null;
-  sub_categories: CategoryObject[];
+  attribute_unit_name: string | null;
+  attribute_unit_short_name: string | null;
 };
 
 type Filter = {
-  category_name?: string;
+  attribute_unit_name?: string;
 };
 
-export const useCategoryStore = defineStore('category', () => {
+export const useAttributeUnitStore = defineStore('attribute-unit', () => {
+  const index: Ref<AttributeUnitObject[]> = ref([]);
+  const created: Ref<Map<string, AttributeUnitObject>> = ref(new Map());
   const filter: Ref<Filter> = ref({});
-  const index: Ref<CategoryObject[]> = ref([]);
-  const created: Ref<Map<string, CategoryObject>> = ref(new Map());
   const options: Ref<QSelectOption<number>[]> = ref([]);
-  const pagination: Ref<QTableProps['pagination']> = ref({
-    page: 1,
-    rowsPerPage: 10,
-  });
 
-  const fetchIndex = async (page = 1, perPage = 10, force = false) => {
+  const fetchIndex = async (force = false) => {
     if (index.value.length === 0 || force) {
       const urlParams = new URLSearchParams(
         Object.entries(filter.value).filter((param) => !!param[1])
       );
 
       return api
-        .get(`categories?${urlParams}`, {
-          params: { page, per_page: perPage },
-        })
+        .get(`attribute-units?${urlParams}`)
         .then((response) => {
-          index.value = response.data.data;
-          if (pagination.value) {
-            pagination.value.page = response.data.meta.current_page;
-            pagination.value.rowsPerPage = response.data.meta.per_page;
-            pagination.value.rowsNumber = response.data.meta.total;
-          }
+          index.value = response.data;
           return response;
         })
         .catch((error) => {
@@ -60,7 +47,7 @@ export const useCategoryStore = defineStore('category', () => {
   const fetchOptions = async (force = false) => {
     if (options.value.length === 0 || force) {
       return api
-        .get('categories/options')
+        .get('attribute-units/options')
         .then((response) => {
           options.value = response.data;
           return response;
@@ -77,17 +64,14 @@ export const useCategoryStore = defineStore('category', () => {
     }
   };
 
-  const create = (prefill: CategoryObject = <CategoryObject>{}) => {
+  const create = (prefill: AttributeUnitObject = <AttributeUnitObject>{}) => {
     const id = self.crypto.randomUUID();
 
     created.value.set(id, {
       ...{
         $id: id,
-        id: null,
-        category_name: null,
-        parent_category: null,
-        parent_category_id: null,
-        sub_categories: [],
+        attribute_unit_name: null,
+        attribute_unit_short_name: null,
       },
       ...prefill,
     });
@@ -96,23 +80,16 @@ export const useCategoryStore = defineStore('category', () => {
   };
 
   const store = async (id: string) => {
-    const category = created.value.get(id);
-    if (!category) throw new Error('Invalid category key');
+    const unit = created.value.get(id);
+    if (!unit) throw new Error('Invalid unit key');
 
     return api
-      .post('categories', category)
+      .post('attribute-units', unit)
       .then(async (response) => {
-        await Promise.all([
-          fetchIndex(
-            pagination.value?.page,
-            pagination.value?.rowsPerPage,
-            true
-          ),
-          fetchOptions(true),
-        ]);
+        await Promise.all([fetchIndex(true), fetchOptions(true)]);
         created.value.delete(id);
         Notify.create({
-          message: 'New category created',
+          message: 'New unit created',
           type: 'positive',
           progress: true,
           position: 'top-right',
@@ -131,22 +108,15 @@ export const useCategoryStore = defineStore('category', () => {
   };
 
   const update = async (id: number) => {
-    const category = index.value.find((category) => category.id === id);
-    if (!category) throw new Error('Invalid category id');
+    const unit = index.value.find((unit) => unit.id === id);
+    if (!unit) throw new Error('Invalid unit id');
 
     return api
-      .put(`categories/${id}`, category)
+      .put(`attribute-units/${id}`, unit)
       .then(async (response) => {
-        await Promise.all([
-          fetchIndex(
-            pagination.value?.page,
-            pagination.value?.rowsPerPage,
-            true
-          ),
-          fetchOptions(true),
-        ]);
+        await Promise.all([fetchIndex(true), fetchOptions(true)]);
         Notify.create({
-          message: 'Category updated',
+          message: 'Unit updated',
           type: 'positive',
           progress: true,
           position: 'top-right',
@@ -166,18 +136,11 @@ export const useCategoryStore = defineStore('category', () => {
 
   const destroy = async (id: number) => {
     return api
-      .delete(`categories/${id}`)
+      .delete(`attribute-units/${id}`)
       .then(async (response) => {
-        await Promise.all([
-          fetchIndex(
-            pagination.value?.page,
-            pagination.value?.rowsPerPage,
-            true
-          ),
-          fetchOptions(true),
-        ]);
+        await Promise.all([fetchIndex(true), fetchOptions(true)]);
         Notify.create({
-          message: 'Category deleted',
+          message: 'Unit deleted',
           type: 'positive',
           progress: true,
           position: 'top-right',
@@ -198,7 +161,6 @@ export const useCategoryStore = defineStore('category', () => {
   return {
     index,
     options,
-    pagination,
     created,
     filter,
     fetchIndex,

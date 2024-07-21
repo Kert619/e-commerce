@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('attribute_group_name');
             $table->foreignId('attribute_category_id')->constrained('attribute_categories')->cascadeOnDelete();
             $table->unsignedInteger('priority');
+            $table->enum('presentation_format', ['default', 'range', 'combined', 'ratio', 'boolean', 'list'])->default('default');
             $table->timestamps();
         });
     }
